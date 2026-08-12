@@ -219,6 +219,41 @@ npm run build
 # Creates optimized dist/ folder for deployment
 ```
 
+## Keep Backend Awake (Render Free Tier)
+
+Render's free tier puts apps to sleep after 15 minutes of inactivity, causing slow cold starts.
+
+**Solution**: Set up a **free** cron job at **cron-job.org** to ping `/health` every 10 minutes.
+
+### Quick Setup (5 minutes)
+1. Go to https://cron-job.org and sign up (free)
+2. Create a new cronjob:
+   - **Title**: ESI Backend Keepalive
+   - **URL**: `https://esi-backend.onrender.com/health`
+   - **Schedule**: Every 10 minutes
+   - **Method**: GET
+3. Enable it
+4. Check Render logs after 20 minutes for: `✓ Health check ping received`
+
+**For detailed setup**: See [KEEPALIVE.md](KEEPALIVE.md)
+
+### Health Check Response
+```bash
+curl https://esi-backend.onrender.com/health
+
+# Returns:
+{
+  "status": "ok",
+  "service": "ESI Backend",
+  "version": "1.0.0",
+  "timestamp": "2026-08-12 15:10:23.456789"
+}
+```
+
+### Cost
+- **Total**: $0 (Render free + cron-job.org free)
+- No additional charges for health checks
+
 ## Troubleshooting
 
 **CORS errors?**

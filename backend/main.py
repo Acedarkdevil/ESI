@@ -69,7 +69,14 @@ def root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    """Health check endpoint for keepalive services (cron-job.org)."""
+    print("✓ Health check ping received")
+    return {
+        "status": "ok",
+        "service": "ESI Backend",
+        "version": "1.0.0",
+        "timestamp": str(__import__('datetime').datetime.utcnow()),
+    }
 
 
 @app.post("/auth/register")

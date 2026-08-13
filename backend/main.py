@@ -25,14 +25,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "https://esi-frontend.vercel.app",
-        "https://esi.vercel.app",
-        "https://frontend-bice-gamma-71e0niatpp.vercel.app",
-        "https://frontend-kmsoz63j9-esi-tech-team.vercel.app",
-    ],
+    allow_origins=["*"],  # Allow all origins for development/testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

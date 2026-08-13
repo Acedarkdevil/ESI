@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict
 
-from fastapi import Depends, FastAPI, HTTPException, status, Request
+from fastapi import Depends, FastAPI, HTTPException, status, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -53,6 +53,24 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+# CORS-enabled OPTIONS handlers
+@app.options("/auth/register")
+@app.options("/auth/login")
+@app.options("/notes/upload")
+@app.options("/papers/upload")
+async def cors_preflight():
+    """Handle CORS preflight requests."""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+            "Access-Control-Max-Age": "3600",
+        },
+    )
 
 
 @app.get("/")

@@ -30,6 +30,7 @@ app.add_middleware(
         "http://127.0.0.1:5173",
         "https://esi-frontend.vercel.app",
         "https://esi.vercel.app",
+        "https://frontend-bice-gamma-71e0niatpp.vercel.app",
         os.getenv("FRONTEND_URL", ""),
     ],
     allow_credentials=True,

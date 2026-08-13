@@ -22,18 +22,17 @@ app = FastAPI(
     description="Alupe University academic platform for notes, papers, and exam simulation.",
     version="1.0.0",
 )
+# NOTE: CORSMiddleware removed - using explicit OPTIONS route handlers instead
+# Middleware was intercepting OPTIONS before route handlers could process them
 
-# Configure CORS - Allow all origins for development/testing
-# Must be BEFORE route registration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-    allow_credentials=False,  # Cannot use True with wildcard origins
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
-    expose_headers=["*"],  # Expose all headers to client
-    max_age=3600,  # Cache preflight for 1 hour
-)
+# Add CORS headers to all responses via middleware
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
+    return response
 
 app.include_router(courses_router)
 app.include_router(notes_router)

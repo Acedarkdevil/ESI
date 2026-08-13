@@ -1,9 +1,32 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://esi-api-v1-ch00.onrender.com',
   timeout: 20000,
+  withCredentials: false,
 });
+
+// Add request interceptor to handle CORS
+api.interceptors.request.use(
+  (config) => {
+    // Remove problematic headers for cross-origin requests
+    delete config.headers['X-Requested-With'];
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Add response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('esi_token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export function setAuthToken(token) {
   if (token) {

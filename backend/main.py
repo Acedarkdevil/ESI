@@ -2,7 +2,7 @@ import os
 from typing import Any, Dict
 
 from fastapi import Depends, FastAPI, HTTPException, status, Request
-from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
@@ -23,33 +23,17 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Add custom middleware to handle CORS for ALL requests
-# This must be added BEFORE any other middleware
-@app.middleware("http")
-async def cors_middleware(request: Request, call_next):
-    # Handle preflight requests immediately
-    if request.method == "OPTIONS":
-        return JSONResponse(
-            content={},
-            status_code=200,
-            headers={
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
-                "Access-Control-Max-Age": "86400",
-                "Access-Control-Allow-Credentials": "false",
-            }
-        )
-    
-    # Process the actual request
-    response = await call_next(request)
-    
-    # Add CORS headers to all responses
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
-    
-    return response
+# Configure CORS - Allow all origins for development/testing
+# Must be BEFORE route registration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=False,  # Cannot use True with wildcard origins
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+    expose_headers=["*"],  # Expose all headers to client
+    max_age=3600,  # Cache preflight for 1 hour
+)
 
 app.include_router(courses_router)
 app.include_router(notes_router)

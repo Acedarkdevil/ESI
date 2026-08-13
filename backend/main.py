@@ -22,17 +22,16 @@ app = FastAPI(
     description="Alupe University academic platform for notes, papers, and exam simulation.",
     version="1.0.1",
 )
-# NOTE: CORSMiddleware removed - using explicit OPTIONS route handlers instead
-# Middleware was intercepting OPTIONS before route handlers could process them
 
-# Add CORS headers to all responses via middleware
-@app.middleware("http")
-async def add_cors_headers(request: Request, call_next):
-    response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
-    return response
+# Configure CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    max_age=3600,
+)
 
 app.include_router(courses_router)
 app.include_router(notes_router)
@@ -52,24 +51,6 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-
-
-# CORS-enabled OPTIONS handlers
-@app.options("/auth/register")
-@app.options("/auth/login")
-@app.options("/notes/upload")
-@app.options("/papers/upload")
-async def cors_preflight():
-    """Handle CORS preflight requests."""
-    return Response(
-        status_code=200,
-        headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
-            "Access-Control-Max-Age": "3600",
-        },
-    )
 
 
 @app.get("/")

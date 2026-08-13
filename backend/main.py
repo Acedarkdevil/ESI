@@ -23,14 +23,19 @@ app = FastAPI(
     version="1.0.1",
 )
 
-# Configure CORS middleware
+# Configure CORS middleware - explicitly list frontend URL
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
+    allow_origins=[
+        "https://frontend-bice-gamma-71e0niatpp.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "*"
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
-    max_age=3600,
+    max_age=7200,
 )
 
 app.include_router(courses_router)
@@ -73,6 +78,21 @@ def health():
         "version": "1.0.0",
         "timestamp": str(__import__('datetime').datetime.utcnow()),
     }
+
+
+# OPTIONS handlers for CORS preflight requests
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str):
+    """Handle OPTIONS requests for CORS preflight."""
+    return Response(
+        status_code=200,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+            "Access-Control-Max-Age": "7200",
+        },
+    )
 
 
 @app.post("/auth/register")

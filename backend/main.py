@@ -124,3 +124,4 @@ def get_me(current_user: User = Depends(get_current_user)):
         "year": current_user.year,
         "course": current_user.course,
     }
+

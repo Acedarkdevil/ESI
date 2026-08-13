@@ -20,7 +20,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="ESI Academic Platform",
     description="Alupe University academic platform for notes, papers, and exam simulation.",
-    version="1.0.0",
+    version="1.0.1",
 )
 # NOTE: CORSMiddleware removed - using explicit OPTIONS route handlers instead
 # Middleware was intercepting OPTIONS before route handlers could process them

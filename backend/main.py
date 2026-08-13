@@ -2,7 +2,6 @@ import os
 from typing import Any, Dict
 
 from fastapi import Depends, FastAPI, HTTPException, status, Request
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -24,34 +23,32 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Configure CORS - Allow all origins for development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,  # Must be False when using wildcard origins
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Add custom middleware to handle preflight requests explicitly
+# Add custom middleware to handle CORS for ALL requests
+# This must be added BEFORE any other middleware
 @app.middleware("http")
 async def cors_middleware(request: Request, call_next):
+    # Handle preflight requests immediately
     if request.method == "OPTIONS":
         return JSONResponse(
             content={},
             status_code=200,
             headers={
                 "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-                "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                "Access-Control-Max-Age": "3600",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept",
+                "Access-Control-Max-Age": "86400",
+                "Access-Control-Allow-Credentials": "false",
             }
         )
     
+    # Process the actual request
     response = await call_next(request)
+    
+    # Add CORS headers to all responses
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Accept"
+    
     return response
 
 app.include_router(courses_router)

@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://esi-api-v1-ch00.onrender.com/$1"
+      "destination": "/api/proxy?path=$1"
     },
     {
       "source": "/(.*)",

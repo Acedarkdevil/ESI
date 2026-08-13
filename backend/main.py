@@ -31,6 +31,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_message():
+    print("✓ ESI Backend v1.0.0 started with WILDCARD CORS enabled")
+
 app.include_router(courses_router)
 app.include_router(notes_router)
 app.include_router(papers_router)

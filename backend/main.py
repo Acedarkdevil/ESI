@@ -31,7 +31,7 @@ app.add_middleware(
         "https://esi-frontend.vercel.app",
         "https://esi.vercel.app",
         "https://frontend-bice-gamma-71e0niatpp.vercel.app",
-        os.getenv("FRONTEND_URL", ""),
+        "https://frontend-kmsoz63j9-esi-tech-team.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
